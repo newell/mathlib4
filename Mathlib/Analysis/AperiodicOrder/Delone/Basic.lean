@@ -39,6 +39,12 @@ aperiodic order, and tiling theory.
 * `DeloneSet.dist_pos_of_ne`
 * `DeloneSet.subset_ball_singleton`
 * `DeloneSet.map`
+* `DeloneSet.packingRadius`
+* `DeloneSet.packingRadius_pos`
+* `DeloneSet.le_dist_of_mem_ne`
+* `DeloneSet.coveringRadius`
+* `DeloneSet.coveringRadius_pos`
+* `DeloneSet.dist_le_coveringRadius`
 -/
 
 @[expose] public section
@@ -166,6 +172,34 @@ lemma map_symm (D : DeloneSet X) (f : X ≃ᵢ Y) : (D.map f).map f.symm = D := 
   ext x; constructor
   · rintro ⟨y, ⟨x₀, hx₀D, rfl⟩, rfl⟩; simpa
   · intro hx; exact ⟨f x, ⟨x, hx, rfl⟩, by simp⟩
+
+/-- The *packing radius* of a Delone set.
+This is a chosen positive constant witnessing uniform discreteness. -/
+noncomputable def packingRadius (D : DeloneSet X) : ℝ :=
+  Classical.choose D.exists_packing_radius
+
+lemma packingRadius_pos (D : DeloneSet X) :
+    0 < D.packingRadius :=
+  (Classical.choose_spec D.exists_packing_radius).1
+
+lemma le_dist_of_mem_ne
+    {D : DeloneSet X} {x y : X}
+    (hx : x ∈ D.carrier) (hy : y ∈ D.carrier) (hne : x ≠ y) :
+    D.packingRadius ≤ dist x y :=
+  (Classical.choose_spec D.exists_packing_radius).2 hx hy hne
+
+/-- The *covering radius* of a Delone set.
+This is a chosen positive constant witnessing relative denseness. -/
+noncomputable def coveringRadius (D : DeloneSet X) : ℝ :=
+  Classical.choose D.exists_covering_radius
+
+lemma coveringRadius_pos (D : DeloneSet X) :
+    0 < D.coveringRadius :=
+  (Classical.choose_spec D.exists_covering_radius).1
+
+lemma dist_le_coveringRadius (D : DeloneSet X) (x : X) :
+    ∃ y ∈ D.carrier, dist x y ≤ D.coveringRadius :=
+  (Classical.choose_spec D.exists_covering_radius).2 x
 
 end DeloneSet
 
